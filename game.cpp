@@ -1,55 +1,40 @@
-#include "raylib.h"
+#include <raylib.h>
+#include <iostream>
+
+int newFunction() {
+    std::cout << "This is a new function!" << std::endl;
+    return 0;
+}
 
 int main() {
-    // 1. Initialize Window
-    // Note: If you want true desktop fullscreen, use 0, 0 but pass FLAG_FULLSCREEN_MODE
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
-    InitWindow(800, 450, "Full Screen Coin Collector");
+    // Initialize the window
+    InitWindow(1289, 720, "My Game");
+    newFunction(); // Call the new function to demonstrate its usage
+    int userInput;
+    std::cin >> userInput; // Wait for user input before starting the game loop
 
-    // Switch to fullscreen immediately
-    ToggleFullscreen();
-
-    // Player variables
-    Vector2 playerPos = { (float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2 };
-    float playerSpeed = 7.0f;
-    float playerRadius = 25.0f;
-
-    // Coin variables
-    Vector2 coinPos = { 400, 300 };
-    float coinRadius = 15.0f;
-    int score = 0;
-
-    SetTargetFPS(60);
-
+    // Main game loop
     while (!WindowShouldClose()) {
-        // Toggle fullscreen with F
-        if (IsKeyPressed(KEY_F)) ToggleFullscreen();
+        // Update game logic here
 
-        // 2. Update Movement (Using screen functions inside the loop to account for resizing)
-        if (IsKeyDown(KEY_RIGHT) && playerPos.x < GetScreenWidth()) playerPos.x += playerSpeed;
-        if (IsKeyDown(KEY_LEFT) && playerPos.x > 0) playerPos.x -= playerSpeed;
-        if (IsKeyDown(KEY_UP) && playerPos.y > 0) playerPos.y -= playerSpeed;
-        if (IsKeyDown(KEY_DOWN) && playerPos.y < GetScreenHeight()) playerPos.y += playerSpeed;
-
-        // 3. Collision Detection
-        if (CheckCollisionCircles(playerPos, playerRadius, coinPos, coinRadius)) {
-            score += 10;
-            coinPos.x = GetRandomValue(50, GetScreenWidth() - 50);
-            coinPos.y = GetRandomValue(50, GetScreenHeight() - 50);
-        }
-
-        // 4. Draw
+        // Draw everything
         BeginDrawing();
-            ClearBackground(RAYWHITE);
-            
-            DrawText(TextFormat("Score: %i", score), 40, 40, 30, DARKGRAY);
-            DrawCircleV(coinPos, coinRadius, GOLD);
-            DrawCircleV(playerPos, playerRadius, MAROON);
-            
-            DrawText("F: Toggle Fullscreen | ESC: Exit", 40, GetScreenHeight() - 60, 20, GRAY);
+        ClearBackground(RAYWHITE);
+        DrawText("Hello, Raylib, My name is Leonardo!", 190, 200, 20, RED);
+        // add a statement to full screen    
+        if (IsKeyPressed(KEY_F)) {
+            ToggleFullscreen();
+        }
         EndDrawing();
     }
 
+    // Close the window and clean up resources
     CloseWindow();
     return 0;
 }
+
+//command to compile: g++ game.cpp -o game -lraylib -lopengl32 -lgdi32 -lwinmm
+// Note: Make sure to have the Raylib library installed and properly linked when comppiling the code.
+// Make sure to have the correct headers in your project, and use the correct flags for linking the Raylib Library.
+// Raylib uses the OpenGL Library API to render graphics, so you need to link against the OpenGL library as well.
+// And remember the most important thing is to have fun while coding your game!
