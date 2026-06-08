@@ -1,7 +1,4 @@
 #include "raylib.h"
-#include <ctime>
-
-// write a player class 
 
 class Enemy 
 {
@@ -10,6 +7,7 @@ class Enemy
         int radius;
         int health;
         Color color;
+
         Enemy(int x, int y, int radius, Color color, int health)
         {
             this->x = x;
@@ -18,12 +16,15 @@ class Enemy
             this->color = color;
             this->health = health;
         }
+
         void Draw()
         {
-            DrawCircle(x, y, radius, color);
+            if (health > 0) DrawCircle(x, y, radius, color);
         }
-         void MoveTowardsPlayer(int playerX, int playerY)
+
+        void MoveTowardsPlayer(int playerX, int playerY)
         {
+            if (health <= 0) return; // Dead enemies don't move
             if (x < playerX) x += 2;
             if (x > playerX) x -= 2;
             if (y < playerY) y += 2;
@@ -52,21 +53,22 @@ class Player
         {
             DrawCircle(x, y, radius, color);
         }
-        void Move(int dx, int dy)
+
+        void Move() // Removed unused dx, dy parameters
         {
             if (IsKeyDown(KEY_W)) y -= 5;
             if (IsKeyDown(KEY_S)) y += 5;
             if (IsKeyDown(KEY_A)) x -= 5;
             if (IsKeyDown(KEY_D)) x += 5;
         }
-        void Punch (Enemy &enemy)
+
+        void Punch(Enemy &enemy)
         {
-            if (CheckCollisionCircles((Vector2){x, y}, radius, (Vector2){enemy.x, enemy.y}, enemy.radius))
+            if (CheckCollisionCircles((Vector2){(float)x, (float)y}, radius, (Vector2){(float)enemy.x, (float)enemy.y}, enemy.radius))
             {
                 enemy.health -= 10;
             }
         }
-        
 };
 
 void DrawHealthValue(int health)
@@ -74,86 +76,86 @@ void DrawHealthValue(int health)
     DrawText(TextFormat("Health: %d", health), 10, 10, 20, WHITE);
 }
 
-void FullscreenToggle()
-{
-    if (IsKeyPressed(KEY_F))
-    {
-        ToggleFullscreen();
-        float screenWidth = GetScreenWidth();
-        float screenHeight = GetScreenHeight();
-
-        screenWidth = GetScreenWidth();
-        screenHeight = GetScreenHeight();
-    }
-}
-
-void PauseGame(bool &isPaused)
-{
-    if (IsKeyPressed(KEY_P))
-    {
-        isPaused = !isPaused;
-        if (isPaused)
-        {
-            DrawText("Game Paused", 350, 300, 40, YELLOW);
-            return;
-        }
-    }
-}
-
 int main()
 {
     bool isPaused = false;
     bool gameOver = false;
-    bool isFullscreen = false;
     float screenWidth = 800;
     float screenHeight = 600;
-    InitWindow(screenWidth, screenHeight, "Game");
     
+    InitWindow(screenWidth, screenHeight, "Game");
     SetTargetFPS(60);
 
     Player player(400, 300, 50, RED, 100);
     Enemy enemy(100, 100, 30, BLUE, 50);
+    
+    double lastDamageTime = 0.0; // Fixed: Use double for Raylib's GetTime()
 
     while (!WindowShouldClose())
     {
-        BeginDrawing();
+        // --- 1. INPUT & TOGGLES (Always check) ---
+        if (IsKeyPressed(KEY_F)) ToggleFullscreen();
+        if (IsKeyPressed(KEY_P) && !gameOver) isPaused = !isPaused;
+        
+        // If game is over, press R to restart
+        if (gameOver && IsKeyPressed(KEY_R)) {
+            player.x = 400;
+            player.y = 300;
+            player.health = 100;
+            enemy.x = 100;
+            enemy.y = 100;
+            enemy.health = 50;
+            gameOver = false;
+        }
 
+        // --- 2. GAME LOGIC (Only update if running) ---
+        if (!isPaused && !gameOver)
+        {
+            player.Move();
+            enemy.MoveTowardsPlayer(player.x, player.y);
+
+            // Player attacking enemy (Trigger punch with SPACE key)
+            if (IsKeyPressed(KEY_SPACE)) {
+                player.Punch(enemy);
+            }
+
+            // Enemy damaging player collision
+            if (enemy.health > 0 && CheckCollisionCircles((Vector2){(float)player.x, (float)player.y}, player.radius, (Vector2){(float)enemy.x, (float)enemy.y}, enemy.radius))
+            {
+                double currentTime = GetTime(); 
+                if (currentTime - lastDamageTime > 1.0) // 1 second cooldown
+                {
+                    player.health -= 20; // Noticeable health drop
+                    lastDamageTime = currentTime;
+                }
+            }
+
+            // Check Win/Loss conditions
+            if (player.health <= 0) gameOver = true;
+        }
+
+        // --- 3. DRAWING ---
+        BeginDrawing();
         ClearBackground(BLACK);
 
-        FullscreenToggle();
-        PauseGame(isPaused);
         player.Draw();
-        player.Move(0, 0);
-        DrawHealthValue(player.health);
-
         enemy.Draw();
-        enemy.MoveTowardsPlayer(player.x, player.y);
-
-        if (player.health <= 0.0)
-        {
-            DrawText("Game Over!", 350, 300, 40, RED);
-                
-                player.x = 400;
-                player.y = 300;
-                player.health = 100;
-                gameOver = true;
-                return 0;
-        }
-
-        if (enemy.health > 0)
-        {
+        
+        DrawHealthValue(player.health);
+        if (enemy.health > 0) {
             DrawText(TextFormat("Enemy Health: %d", enemy.health), 10, 40, 20, WHITE);
+        } else {
+            DrawText("Enemy Defeated!", 10, 40, 20, GREEN);
         }
 
-        if (CheckCollisionCircles((Vector2){player.x, player.y}, player.radius, (Vector2){enemy.x, enemy.y}, enemy.radius))
-        {
-            time_t currentTime = GetTime();
-            static time_t lastDamageTime = 0;
-            if (currentTime - lastDamageTime > 1) // 1 second cooldown
-            {
-                lastDamageTime = currentTime;
-            }
-            player.health -= 1;
+        // Overlays
+        if (isPaused) {
+            DrawText("Game Paused", 320, 280, 40, YELLOW);
+        }
+        
+        if (gameOver) {
+            DrawText("Game Over!", 320, 250, 40, RED);
+            DrawText("Press 'R' to Restart", 290, 310, 20, WHITE);
         }
 
         EndDrawing();
