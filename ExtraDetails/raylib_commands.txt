@@ -1,0 +1,13 @@
+Compile:
+g++ main.cpp -o game.exe -lraylib -lopengl32 -lgdi32 -lwinmm
+
+g++ main.cpp -o game.exe -lraylib -lopengl32 -lgdi32 -lwinmm -mwindows
+
+the -lraylib flags allows the program to recognize the raylib library/framework.
+The -static flag allows the executable file to run on other windows systems.
+The -mwindows flag prevents the terminal form opening.
+
+The flags are neccessary to compile. without them you will get a compile error.
+
+Run:
+./game.exe

@@ -1,0 +1,84 @@
+WINDOW MANAGEMENT
+InitWindow(width, height, "title") - Initialize window
+SetTargetFPS(60) - Set framerate limit
+WindowShouldClose() - Returns true if ESC or X is pressed
+CloseWindow() - Close window and context
+SetWindowState(FLAG_WINDOW_RESIZABLE) - Allow manual resizing
+GetScreenWidth() - Returns current window width
+GetScreenHeight() - Returns current window height
+ToggleFullscreen() - Switches between windowed and fullscreen
+
+DRAWING CYCLE
+BeginDrawing() - Start canvas drawing
+ClearBackground(COLOR) - Wipe screen with color (e.g., RAYWHITE, BLACK, GOLD)
+EndDrawing() - End drawing and swap buffers
+
+SHAPES AND TEXT
+DrawCircleV(Vector2, radius, color) - Draw circle using Vector2
+DrawRectangle(x, y, w, h, color) - Draw solid rectangle
+DrawLine(startPosX, startPosY, endPosX, endPosY, color) - Draw line
+DrawText("text", x, y, fontSize, color) - Display string on screen
+TextFormat("Score: %i", score) - Format integers for DrawText
+
+MODELS
+LoadModel()
+UnloadModel()
+LoadTexture()
+DrawModel()
+DrawModelEx()
+LoadModelAnimations()
+UpdateModelAnimation()
+DrawModel(model, position, scale, tint);
+DrawModel(robot, {0, 0, 0}, 2.0f, WHITE);
+
+CAMERA
+Camera3D camera = { 0 };
+
+camera.position = { 5.0f, 5.0f, 5.0f };
+camera.target = { 0.0f, 0.0f, 0.0f };
+camera.up = { 0.0f, 1.0f, 0.0f };
+camera.fovy = 45.0f;
+camera.projection = CAMERA_PERSPECTIVE;
+
+INPUT HANDLING
+IsKeyDown(KEY_RIGHT) - True while key is held
+IsKeyPressed(KEY_SPACE) - True only on initial press
+IsMouseButtonPressed(MOUSE_BUTTON_LEFT) - True on mouse click
+GetMousePosition() - Returns Vector2 of mouse coordinates
+
+PHYSICS AND MATH
+CheckCollisionCircles(pos1, rad1, pos2, rad2) - Circle collision check
+CheckCollisionRecs(rec1, rec2) - Rectangle collision check
+GetRandomValue(min, max) - Returns random integer
+Vector2 - Struct with .x and .y floats
+COMPILER COMMAND
+g++ file.cpp -o game.exe -lraylib -lopengl32 -lgdi32 -lwinmm -mwindows
+TIPS
+Put -lraylib before system libraries in the build command
+Update positions before calling BeginDrawing
+Use (float) casting when dividing screen dimensions for Vector2
+Use -mwindows to hide the console window on launch
+Ensure all assets are in the same folder as the executable
+
+COLOR LIST
+LIGHTGRAY, GRAY, DARKGRAY, YELLOW, GOLD, ORANGE, PINK, RED, MAROON, GREEN, LIME, DARKGREEN, BLUE, DARKBLUE, PURPLE, VIOLET, DARKPURPLE, BEIGE, BROWN, DARKBROWN, WHITE, BLACK, BLANK (Transparent), MAGENTA, RAYWHITE
+
+COMMON DATA STRUCTURES
+Vector2 : { float x; float y; }
+Rectangle : { float x; float y; float width; float height; }
+Color : { unsigned char r; unsigned char g; unsigned char b; unsigned char a; }
+
+TIMING & DELTA TIME
+GetFrameTime() : Returns time in seconds since last frame (used for smooth movement).
+Formula: position.x += speed * GetFrameTime(); (Moves at same speed regardless of FPS).
+AUDIO (REQUIRES INIT)
+InitAudioDevice() : Call once at start.
+CloseAudioDevice() : Call at end.
+LoadSound("file.wav") : Load sound into memory.
+PlaySound(sound) : Play the sound once.
+UnloadSound(sound) : Clear sound from memory.
+
+TEXTURE HANDLING
+LoadTexture("file.png") : Load image into VRAM.
+DrawTexture(texture, x, y, color) : Display image.
+UnloadTexture(texture) : Clear image from VRAM.

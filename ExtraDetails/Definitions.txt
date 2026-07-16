@@ -1,0 +1,37 @@
+Raylib C++ Compile Cheat Sheet
+
+Command to compile:
+g++ newGame.cpp -o game -lraylib -lopengl32 -lgdi32 -lwinmm
+
+Command to run:
+./game.exe
+
+Breakdown of every part:
+
+g++
+The C++ compiler included with MSYS2.
+
+newGame.cpp
+The source file you want to compile. Change the name if your file is different.
+
+-o game
+Creates an output file named game.exe.
+
+-lraylib
+Links the Raylib library so you can use InitWindow, DrawText, and other Raylib functions.
+
+-lopengl32
+Links the Windows OpenGL library that Raylib uses for rendering.
+
+-lgdi32
+Links the Windows GDI library that handles basic drawing operations.
+
+-lwinmm
+Links the Windows multimedia library that Raylib uses for audio and timing.
+
+How to use this cheat sheet:
+1. Save this file.
+2. Open it when you need to compile.
+3. Copy the compile command.
+4. Paste it in the MSYS2 terminal.
+5. Run the game with ./game.exe
