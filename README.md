@@ -1,3 +1,3 @@
 # Leonardo
 Hello!
-Adn welcome to my codebase!
+And welcome to my codebase!
